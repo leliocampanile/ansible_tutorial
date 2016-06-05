@@ -1,0 +1,45 @@
+- name: Install Packages for Postgres
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - postgresql
+    - postgresql-server-dev-9.3
+    - libpq-dev # Required for Ansible to interact with postgres
+    - python-psycopg2 # Required for Ansible to interact with postgres
+
+
+- name: Create Database
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db: name={{ db_name }}
+
+- name: Create SuperUser
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name={{ db_user }} password={{ db_password }} state=present role_attr_flags=SUPERUSER,CREATEDB
+
+- name: Provide user with DB permissions
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: user={{ db_user }} db={{ db_name }} priv=ALL
+
+
+- name: Start the Postgresql service
+  sudo: yes
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: get backup db data
+  sudo: yes
+  get_url: url={{ db_file_link }} dest=/tmp/costanzo_db.sql.zip
+
+- name: unzip backup db
+  sudo: yes
+  unarchive: src=/tmp/costanzo_db.sql.zip dest=/tmp/ copy=no
+
+- name: Importing costanzo test data
+  sudo: yes
+  sudo_user: postgres
+  shell: psql {{ db_name }} < /tmp/2015-10-26-backup-costanzo.sql

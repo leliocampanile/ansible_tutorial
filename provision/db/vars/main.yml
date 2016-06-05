@@ -1,0 +1,4 @@
+db_name: costanzo_3k
+db_user: postgres
+db_password: postgres
+db_file_link: https://dl.dropboxusercontent.com/u/18100693/2015-10-26-backup-costanzo.sql.zip

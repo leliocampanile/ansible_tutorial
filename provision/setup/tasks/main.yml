@@ -1,0 +1,17 @@
+- name: Install Packages
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - python-setuptools
+    - python-virtualenv
+    - python-pip
+    - git
+    - build-essential
+    - python-dev
+    - libjpeg-dev
+    - unzip
+
+- name: Upgrade pip
+  sudo: yes
+  pip: name=pip state=latest
+  tags: packages
